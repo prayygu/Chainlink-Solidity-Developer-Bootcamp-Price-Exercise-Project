@@ -49,6 +49,15 @@ module.exports = async ({
     log("npx hardhat request-random-number --contract " + randomNumberConsumer.address + " --network " + networkName)
   }
   log("----------------------------------------------------")
+  //try to fund Price Exercise
+  const PriceExercise = await deployments.get('PriceExercise')
+  const priceExercise = await ethers.getContractAt('PriceExercise', PriceExercise.address)
+ 
+  if (await autoFundCheck(priceExercise.address, networkName, linkTokenAddress, additionalMessage)) {
+    await hre.run("fund-link",{contract: priceExercise.address, linkaddress: linkTokenAddress})
+  } else {
+    log("Couldn't fund Price Exercise contract. Send 1 LINK to it manually in MetaMask")
+  }
 
 }
 module.exports.tags = ['all']
